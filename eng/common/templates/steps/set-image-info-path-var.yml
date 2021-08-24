@@ -13,7 +13,14 @@ steps:
         $publicSourceBranch = "main"
     }
 
-    $imageInfoVersionsPath = "build-info/docker/image-info.$buildRepoName-$publicSourceBranch$env:IMAGEINFOVARIANT.json"
+    if ($env:SYSTEM_TEAMPROJECT -eq $env:PUBLICPROJECTNAME) {
+        $basePath = $env:gitHubVersionsRepoInfo_PATH
+    }
+    else {
+        $basePath= $env:azdoVersionsRepoInfo_PATH
+    }
+
+    $imageInfoVersionsPath = "$basePath/image-info.$buildRepoName-$publicSourceBranch$env:IMAGEINFOVARIANT.json"
 
     echo "##vso[task.setvariable variable=imageInfoVersionsPath]$imageInfoVersionsPath"
   displayName: Set Image Info Path Var

@@ -10,8 +10,16 @@ trigger:
     - src/*
 pr: none
 
+resources:
+  repositories:
+  - repository: InternalVersionsRepo
+    type: git
+    name: internal/dotnet-versions
+
 variables:
 - template: variables/core.yml
+- name: internalProjectName
+  value: internal
 - name: officialBranches
   value: "'nightly'"
 

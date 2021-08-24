@@ -14,7 +14,7 @@ pr:
 
 resources:
   repositories:
-  - repository: VersionsRepo
+  - repository: PublicVersionsRepo
     type: github
     endpoint: dotnet
     name: dotnet/versions

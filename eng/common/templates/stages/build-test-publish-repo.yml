@@ -50,29 +50,30 @@ stages:
       buildJobTimeout: ${{ parameters.linuxAmdBuildJobTimeout }}
       customInitSteps: ${{ parameters.customBuildInitSteps }}
       noCache: ${{ parameters.noCache }}
-  - template: ../jobs/build-images.yml
-    parameters:
-      name: Linux_arm64v8
-      pool:
-        ${{ if eq(variables['System.TeamProject'], 'public') }}:
-          name: DotNetCore-Docker-Public
-        ${{ if eq(variables['System.TeamProject'], 'internal') }}:
-          name: DotNetCore-Docker
-        demands:
-        - Agent.OS -equals linux
-        - Agent.OSArchitecture -equals ARM64
-      matrix: dependencies.GenerateBuildMatrix.outputs['matrix.LinuxArm64v8']
-      dockerClientOS: linux
-      buildJobTimeout: ${{ parameters.linuxArmBuildJobTimeout }}
-      customInitSteps: ${{ parameters.customBuildInitSteps }}
-      noCache: ${{ parameters.noCache }}
+  - ${{ if eq(variables['System.TeamProject'], variables.internalProjectName) }}:
+    - template: ../jobs/build-images.yml
+      parameters:
+        name: Linux_arm64v8
+        pool:
+          ${{ if eq(variables['System.TeamProject'], variables.publicProjectName) }}:
+            name: DotNetCore-Docker-Public
+          ${{ if eq(variables['System.TeamProject'], variables.internalProjectName) }}:
+            name: DotNetCore-Docker
+          demands:
+          - Agent.OS -equals linux
+          - Agent.OSArchitecture -equals ARM64
+        matrix: dependencies.GenerateBuildMatrix.outputs['matrix.LinuxArm64v8']
+        dockerClientOS: linux
+        buildJobTimeout: ${{ parameters.linuxArmBuildJobTimeout }}
+        customInitSteps: ${{ parameters.customBuildInitSteps }}
+        noCache: ${{ parameters.noCache }}
   - template: ../jobs/build-images.yml
     parameters:
       name: Linux_arm32v7
       pool:
-        ${{ if eq(variables['System.TeamProject'], 'public') }}:
+        ${{ if eq(variables['System.TeamProject'], variables.publicProjectName) }}:
           name: DotNetCore-Docker-Public
-        ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+        ${{ if eq(variables['System.TeamProject'], variables.internalProjectName) }}:
           name: DotNetCore-Docker
         demands:
         - Agent.OS -equals linux
@@ -131,16 +132,17 @@ stages:
 ################################################################################
 # Post-Build
 ################################################################################
-- stage: Post_Build
-  dependsOn: Build
-  condition: and(succeeded(), contains(variables['stages'], 'build'))
-  jobs:
-  - template: ../jobs/post-build.yml
+- ${{ if eq(variables.internalProjectName, 'internal') }}:
+  - stage: Post_Build
+    dependsOn: Build
+    condition: and(succeeded(), contains(variables['stages'], 'build'))
+    jobs:
+    - template: ../jobs/post-build.yml
 
 ################################################################################
 # Test Images
 ################################################################################
-- ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+- ${{ if eq(variables['System.TeamProject'], variables.internalProjectName) }}:
   - stage: Test
     dependsOn: Post_Build
     condition: "
@@ -221,9 +223,9 @@ stages:
 # Publish Images
 ################################################################################
 - stage: Publish
-  ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+  ${{ if eq(variables['System.TeamProject'], variables.internalProjectName) }}:
     dependsOn: Test
-  ${{ if eq(variables['System.TeamProject'], 'public') }}:
+  ${{ if eq(variables['System.TeamProject'], variables.publicProjectName) }}:
     dependsOn: Post_Build
   condition: "
     and(

@@ -1,5 +1,5 @@
 steps:
-- ${{ if eq(variables['System.TeamProject'], 'internal') }}:
+- ${{ if eq(variables['System.TeamProject'], variables.internalProjectName) }}:
   - script: |
       if [[ "$OFFICIALBRANCHES" != *\'$SOURCEBRANCH\'* && \
             "$PUBLISHREPOPREFIX" == "public/" && \

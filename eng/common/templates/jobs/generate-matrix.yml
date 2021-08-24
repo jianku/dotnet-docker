@@ -9,6 +9,8 @@ jobs:
   pool:
     vmImage: $(defaultLinuxAmd64PoolImage)
   steps:
+  - script: echo $(azdoVersionsRepoInfo.org)
+  - script: echo $(azdoVersionsRepoInfo.project)
   - template: ../steps/init-docker-linux.yml
   - template: ../steps/validate-branch.yml
   - ${{ if eq(parameters.isTestStage, true) }}:
