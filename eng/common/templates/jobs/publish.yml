@@ -1,5 +1,8 @@
 parameters:
   pool: {}
+  internalProjectName: null
+  publicProjectName: null
+  customInitSteps: []
 jobs:
 - job: Publish
   pool: ${{ parameters.pool }}
@@ -10,14 +13,21 @@ jobs:
       --registry-override '$(acr.server)'
       $(manifestVariables)
       $(imageBuilder.queueArgs)
+  - name: internalProjectName
+    value: ${{ parameters.internalProjectName }}
+  - name: publicProjectName
+    value: ${{ parameters.publicProjectName }}
   steps:
   - template: ../steps/init-docker-linux.yml
+  - ${{ parameters.customInitSteps }}
   - template: ../steps/validate-branch.yml
+  - template: ../steps/set-image-info-path-var.yml
+    parameters:
+      publicSourceBranch: $(publicSourceBranch)
   - template: ../steps/download-build-artifact.yml
     parameters:
       targetPath: $(Build.ArtifactStagingDirectory)
       artifactName: image-info
-  - template: ../steps/set-image-info-path-var.yml
   - template: ../steps/set-dry-run.yml
   - script: echo $(sourceBuildId) > $(Build.ArtifactStagingDirectory)/source-build-id.txt
     displayName: Write Source Build ID to File

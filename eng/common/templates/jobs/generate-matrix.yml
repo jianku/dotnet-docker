@@ -3,14 +3,18 @@ parameters:
   name: null
   customBuildLegGroupArgs: ""
   isTestStage: false
+  internalProjectName: null
+  publicProjectName: null
 
 jobs:
 - job: ${{ parameters.name }}
   pool:
     vmImage: $(defaultLinuxAmd64PoolImage)
+  variables:
+    internalProjectName: ${{ parameters.internalProjectName }}
+    publicProjectName: ${{ parameters.publicProjectName }}
   steps:
-  - script: echo $(azdoVersionsRepoInfo.org)
-  - script: echo $(azdoVersionsRepoInfo.project)
+  - script: echo $(internalProjectName)
   - template: ../steps/init-docker-linux.yml
   - template: ../steps/validate-branch.yml
   - ${{ if eq(parameters.isTestStage, true) }}:

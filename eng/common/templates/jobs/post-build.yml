@@ -1,7 +1,13 @@
+parameters:
+  internalProjectName: null
+  publicProjectName: null
 jobs:
 - job: Build
   pool:
     vmImage: $(defaultLinuxAmd64PoolImage)
+  variables:
+    internalProjectName: ${{ parameters.internalProjectName }}
+    publicProjectName: ${{ parameters.publicProjectName }}
   steps:
   - template: ../steps/init-docker-linux.yml
   - template: ../steps/download-build-artifact.yml

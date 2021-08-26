@@ -3,6 +3,8 @@ parameters:
   pool: {}
   matrix: {}
   testJobTimeout: 60
+  internalProjectName: null
+  publicProjectName: null
 jobs:
 - job: ${{ parameters.name }}
   condition: and(succeeded(), ${{ parameters.matrix }})
@@ -11,5 +13,8 @@ jobs:
   strategy:
     matrix: $[ ${{ parameters.matrix }} ]
   timeoutInMinutes: ${{ parameters.testJobTimeout }}
+  variables:
+    internalProjectName: ${{ parameters.internalProjectName }}
+    publicProjectName: ${{ parameters.publicProjectName }}
   steps:
   - template: ../steps/test-images-windows-client.yml

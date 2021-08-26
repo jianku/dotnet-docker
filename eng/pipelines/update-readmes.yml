@@ -4,8 +4,10 @@ variables:
 - template: variables/core.yml
 jobs:
 - job: UpdateReadmes
-  pool: Hosted Ubuntu 1604
+  pool: $(defaultLinuxAmd64PoolImage)
   steps:
   - template: ../common/templates/steps/init-docker-linux.yml
+  - template: ../steps/set-image-info-path-var.yml
+  - template: ../steps/set-publish-mcrdocs-args-var.yml
   - template: ../common/templates/steps/publish-readmes.yml
   - template: ../common/templates/steps/cleanup-docker-linux.yml

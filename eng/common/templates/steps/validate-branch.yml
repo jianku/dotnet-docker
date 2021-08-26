@@ -1,4 +1,6 @@
 steps:
+- script: echo $(internalProjectName)
+- script: echo ${{ variables.internalProjectName }}
 - ${{ if eq(variables['System.TeamProject'], variables.internalProjectName) }}:
   - script: |
       if [[ "$OFFICIALBRANCHES" != *\'$SOURCEBRANCH\'* && \

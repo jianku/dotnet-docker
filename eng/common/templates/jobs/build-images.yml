@@ -6,19 +6,23 @@ parameters:
   buildJobTimeout: 60
   customInitSteps: []
   noCache: false
+  internalProjectName: null
+  publicProjectName: null
 
 jobs:
 - job: ${{ parameters.name }}
   condition: and(succeeded(), ${{ parameters.matrix }})
   dependsOn:
-  - PreBuildValidation
-  - CopyBaseImages
+  # - PreBuildValidation
+  # - CopyBaseImages
   - GenerateBuildMatrix
   pool: ${{ parameters.pool }}
   strategy:
     matrix: $[ ${{ parameters.matrix }} ]
   timeoutInMinutes: ${{ parameters.buildJobTimeout }}
   variables:
+    internalProjectName: ${{ parameters.internalProjectName }}
+    publicProjectName: ${{ parameters.publicProjectName }}
     imageBuilderDockerRunExtraOptions: $(build.imageBuilderDockerRunExtraOptions)
     versionsRepoPath: versions
     ${{ if eq(parameters.noCache, false) }}:
@@ -61,9 +65,11 @@ jobs:
   - template: ${{ format('../steps/init-docker-{0}.yml', parameters.dockerClientOS) }}
   - ${{ parameters.customInitSteps }}
   - template: ../steps/set-image-info-path-var.yml
+    parameters:
+      publicSourceBranch: $(publicSourceBranch)
   - powershell: |
       $imageBuilderBuildArgs = "$(imageBuilder.queueArgs) --image-info-output-path $(artifactsPath)/$(legName)-image-info.json"
-      if ($env:SYSTEM_TEAMPROJECT -eq "internal") {
+      if ($env:SYSTEM_TEAMPROJECT -eq $env:INTERNALPROJECTNAME) {
         $imageBuilderBuildArgs = "$imageBuilderBuildArgs --registry-override $(acr.server) --repo-prefix $(stagingRepoPrefix) --source-repo-prefix $(mirrorRepoPrefix) --push --registry-creds ""$(acr.server)=$(acr.userName);$(acr.password)"""
       }
 
