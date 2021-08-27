@@ -15,10 +15,14 @@ stages:
       buildMatrixCustomBuildLegGroupArgs: --custom-build-leg-group pr-build --custom-build-leg-group test-dependencies
     ${{ if not(parameters.isPullRequestPipeline) }}:
       buildMatrixCustomBuildLegGroupArgs: --custom-build-leg-group test-dependencies
+    ${{ if eq(variables['System.TeamProject'], parameters.internalProjectName) }}:
+      customPublishVariables:
+      - group: DotNet-AllOrgs-Darc-Pats
 
-    # Template paths must be relative to the job YAML that executes them
+    # Template paths must be relative to the YAML job that executes them
     customBuildInitSteps:
     - template: ../../../pipelines/steps/set-public-source-branch-var.yml
     customPublishInitSteps:
     - template: ../../../pipelines/steps/set-public-source-branch-var.yml
     - template: ../../../pipelines/steps/set-publish-mcrdocs-args-var.yml
+    

@@ -1,15 +1,10 @@
 variables:
 - template: common.yml
 
-- ${{ if eq(variables['System.TeamProject'], variables.internalProjectName) }}:
-  - group: DotNet-AllOrgs-Darc-Pats
-
 - name: commonVersionsImageInfoPath
   value: build-info/docker
 - name: publicGitRepoUri
   value: https://github.com/dotnet/dotnet-docker
-- name: productVersionComponents
-  value: 2
 - name: testResultsDirectory
   value: tests/Microsoft.DotNet.Docker.Tests/TestResults/
 - name: mirrorRegistryCreds

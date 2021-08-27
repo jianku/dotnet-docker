@@ -5,6 +5,7 @@ parameters:
   testMatrixCustomBuildLegGroupArgs: ""
   customBuildInitSteps: []
   customPublishInitSteps: []
+  customPublishVariables: []
   
   linuxAmdBuildJobTimeout: 60
   linuxArmBuildJobTimeout: 60
@@ -43,7 +44,6 @@ stages:
   #   parameters:
   #     name: CopyBaseImages
   #     additionalOptions: "--manifest '$(manifest)' $(manifestVariables)"
-  #     internalProjectName: ${{ parameters.internalProjectName }}
   #     publicProjectName: ${{ parameters.publicProjectName }}
   - template: ../jobs/generate-matrix.yml
     parameters:
@@ -51,7 +51,6 @@ stages:
       name: GenerateBuildMatrix
       customBuildLegGroupArgs: ${{ parameters.buildMatrixCustomBuildLegGroupArgs }}
       internalProjectName: ${{ parameters.internalProjectName }}
-      publicProjectName: ${{ parameters.publicProjectName }}
   - template: ../jobs/build-images.yml
     parameters:
       name: Linux_amd64
@@ -164,9 +163,6 @@ stages:
   condition: and(succeeded(), contains(variables['stages'], 'build'))
   jobs:
   - template: ../jobs/post-build.yml
-    parameters:
-      internalProjectName: ${{ parameters.internalProjectName }}
-      publicProjectName: ${{ parameters.publicProjectName }}
 
 ################################################################################
 # Test Images
@@ -199,6 +195,8 @@ stages:
           vmImage: $(defaultLinuxAmd64PoolImage)
         matrix: dependencies.GenerateTestMatrix.outputs['matrix.LinuxAmd64']
         testJobTimeout: ${{ parameters.linuxAmdTestJobTimeout }}
+        internalProjectName: ${{ parameters.internalProjectName }}
+        publicProjectName: ${{ parameters.publicProjectName }}
     - template: ../jobs/test-images-linux-client.yml
       parameters:
         name: Linux_arm64v8
@@ -305,4 +303,4 @@ stages:
       pool:
         vmImage: $(defaultLinuxAmd64PoolImage)
       internalProjectName: ${{ parameters.internalProjectName }}
-      publicProjectName: ${{ parameters.publicProjectName }}
+      customPublishVariables: ${{ parameters.customPublishVariables }}

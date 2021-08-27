@@ -4,19 +4,16 @@ parameters:
   customBuildLegGroupArgs: ""
   isTestStage: false
   internalProjectName: null
-  publicProjectName: null
 
 jobs:
 - job: ${{ parameters.name }}
   pool:
     vmImage: $(defaultLinuxAmd64PoolImage)
-  variables:
-    internalProjectName: ${{ parameters.internalProjectName }}
-    publicProjectName: ${{ parameters.publicProjectName }}
   steps:
-  - script: echo $(internalProjectName)
   - template: ../steps/init-docker-linux.yml
   - template: ../steps/validate-branch.yml
+    parameters:
+      internalProjectName: ${{ parameters.internalProjectName }}
   - ${{ if eq(parameters.isTestStage, true) }}:
     - template: ../steps/download-build-artifact.yml
       parameters:

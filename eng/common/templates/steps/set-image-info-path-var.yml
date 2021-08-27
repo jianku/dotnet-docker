@@ -3,11 +3,6 @@ parameters:
 
 steps:
 - powershell: |
-    # If a imageInfoVersionsPath AzDO variable has already been set, use it. 
-    if ($env:IMAGEINFOVERSIONSPATH) {
-        return
-    }
-
     if ("$(System.TeamProject)" -eq "$(publicProjectName)") {
         $basePath = "$(gitHubVersionsRepoInfo.path)"
     }
@@ -22,7 +17,9 @@ steps:
     }
 
     $buildRepoName = "$(Build.Repository.Name)".Replace("/", "-")
-    $imageInfoVersionsPath = "$basePath/image-info.$buildRepoName-$publicSourceBranch$(imageInfoVariant).json"
+    $imageInfoName = "image-info.$buildRepoName-$publicSourceBranch$(imageInfoVariant).json"
 
-    echo "##vso[task.setvariable variable=imageInfoVersionsPath]$imageInfoVersionsPath"
-  displayName: Set Image Info Path Var
+    echo "##vso[task.setvariable variable=imageInfoVersionsPath]$basePath/$imageInfoName"
+    echo "##vso[task.setvariable variable=gitHubImageInfoVersionsPath]$(gitHubVersionsRepoInfo.path)/$imageInfoName"
+    echo "##vso[task.setvariable variable=azdoImageInfoVersionsPath]$(azdoVersionsRepoInfo.path)/$imageInfoName"
+  displayName: Set Image Info Path Vars

@@ -1,19 +1,15 @@
 parameters:
   name: null
   additionalOptions: null
-  internalProjectName: null
   publicProjectName: null
   
 jobs:
 - job: ${{ parameters.name }}
   pool:
     vmImage: $(defaultLinuxAmd64PoolImage)
-  variables:
-    internalProjectName: ${{ parameters.internalProjectName }}
-    publicProjectName: ${{ parameters.publicProjectName }}
   steps:
   - template: ../steps/init-docker-linux.yml
-  - ${{ if eq(variables['System.TeamProject'], variables.publicProjectName) }}:
+  - ${{ if eq(variables['System.TeamProject'], parameters.publicProjectName) }}:
     - template: ../steps/set-dry-run.yml
   - script: >
       $(runImageBuilderCmd)

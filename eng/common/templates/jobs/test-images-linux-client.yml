@@ -6,6 +6,7 @@ parameters:
   preBuildValidation: false
   internalProjectName: null
   publicProjectName: null
+
 jobs:
 - job: ${{ parameters.name }}
   ${{ if eq(parameters.preBuildValidation, 'false') }}:
@@ -15,10 +16,9 @@ jobs:
       matrix: $[ ${{ parameters.matrix }} ]
   pool: ${{ parameters.pool }}
   timeoutInMinutes: ${{ parameters.testJobTimeout }}
-  variables:
-    internalProjectName: ${{ parameters.internalProjectName }}
-    publicProjectName: ${{ parameters.publicProjectName }}
   steps:
   - template: ../steps/test-images-linux-client.yml
     parameters:
       preBuildValidation: ${{ parameters.preBuildValidation }}
+      internalProjectName: ${{ parameters.internalProjectName }}
+      publicProjectName: ${{ parameters.publicProjectName }}

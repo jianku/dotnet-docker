@@ -1,8 +1,8 @@
 parameters:
   pool: {}
   internalProjectName: null
-  publicProjectName: null
   customInitSteps: []
+  customPublishVariables: []
 jobs:
 - job: Publish
   pool: ${{ parameters.pool }}
@@ -13,14 +13,13 @@ jobs:
       --registry-override '$(acr.server)'
       $(manifestVariables)
       $(imageBuilder.queueArgs)
-  - name: internalProjectName
-    value: ${{ parameters.internalProjectName }}
-  - name: publicProjectName
-    value: ${{ parameters.publicProjectName }}
+  - ${{ parameters.customPublishVariables }}
   steps:
   - template: ../steps/init-docker-linux.yml
   - ${{ parameters.customInitSteps }}
   - template: ../steps/validate-branch.yml
+    parameters:
+      internalProjectName: ${{ parameters.internalProjectName }}
   - template: ../steps/set-image-info-path-var.yml
     parameters:
       publicSourceBranch: $(publicSourceBranch)
@@ -92,10 +91,10 @@ jobs:
       --git-owner '$(gitHubVersionsRepoInfo.org)'
       --git-repo '$(gitHubVersionsRepoInfo.repo)'
       --git-branch '$(gitHubVersionsRepoInfo.branch)'
-      --git-path '$(gitHubVersionsRepoInfo.path)'
+      --git-path '$(gitHubImageInfoVersionsPath)'
       --azdo-repo '$(azdoVersionsRepoInfo.repo)'
       --azdo-branch '$(azdoVersionsRepoInfo.branch)'
-      --azdo-path '$(azdoVersionsRepoInfo.path)'
+      --azdo-path '$(azdoImageInfoVersionsPath)'
       $(dryRunArg)
       $(imageBuilder.commonCmdArgs)
     displayName: Publish Image Info
